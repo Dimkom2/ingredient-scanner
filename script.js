@@ -55,11 +55,11 @@ function analyze() {
       known++;
       const div = document.createElement("div");
       div.className = data.level;
-      div.innerHTML = <b>${word}</b>: ${data.comment};  // исправлено!
+      div.innerHTML = `<b>${word}</b>: ${data.comment}`;  // исправлено!
       output.appendChild(div);
     } else {
       const unknown = document.createElement("div");
-      unknown.innerHTML = <i>${word}</i>: <span style="color: gray">ингредиент не найден / не опознан</span>;  // исправлено!
+      unknown.innerHTML = `<i>${word}</i>: <span style="color: gray">ингредиент не найден / не опознан</span>`;  // исправлено!
       output.appendChild(unknown);
     }
   });
