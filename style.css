@@ -6,10 +6,13 @@ body {
 
 textarea {
   width: 100%;
-  height: 120px;
+  min-height: 50px;        /* минимальная высота */
+  max-height: 200px;       /* высота-ограничитель */
   font-size: 16px;
   padding: 10px;
   margin-bottom: 10px;
+  overflow-y: hidden;      /* скрыть скролл пока текст помещается */
+  resize: none;            /* запретить ручное изменение размера */
 }
 
 button {
