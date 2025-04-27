@@ -8,8 +8,13 @@
 </head>
 <body>
   <h1>Сканер состава продуктов</h1>
+
   <textarea id="input" placeholder="Введите состав продукта..."></textarea>
+  <br><br>
+
+  <input type="file" id="imageInput" accept="image/*" />
   <button onclick="analyze()">Проверить состав</button>
+
   <div id="output"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
