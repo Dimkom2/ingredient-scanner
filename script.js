@@ -6,10 +6,16 @@ const ingredientsDB = {
 };
 
 function analyze() {
-  const input = document.getElementById("input").value.toLowerCase();
+  const input = document.getElementById("input").value.toLowerCase().trim();  // Добавлена обработка пробелов в начале и конце
   const words = input.split(/[ ,.;:\n]+/);
   const output = document.getElementById("output");
   output.innerHTML = "";
+
+  if (input === "") {  // проверка на пустой ввод сразу
+    output.innerHTML = "<i>Пожалуйста, введите состав продукта.</i>";
+    return;
+  }
+
   let known = 0;
   words.forEach(word => {
     const data = ingredientsDB[word];
@@ -25,7 +31,25 @@ function analyze() {
       output.appendChild(unknown);
     }
   });
-  if (known === 0 && words.length === 1 && words[0] === "") {
-    output.innerHTML = "<i>Пожалуйста, введите состав продукта.</i>";
+}
+
+// Функция для автоувеличения текстового поля
+function autoResizeTextarea() {
+  const textarea = document.getElementById("input");
+  textarea.style.height = "auto"; // сбросить старую высоту
+  textarea.style.height = textarea.scrollHeight + "px"; // установить новую высоту по контенту
+  
+  const maxHeight = 200; // максимальная высота в пикселях
+  if (textarea.scrollHeight > maxHeight) {
+    textarea.style.height = maxHeight + "px";
+    textarea.style.overflowY = "auto"; // добавить полосу прокрутки
+  } else {
+    textarea.style.overflowY = "hidden"; // убрать полосу прокрутки
   }
 }
+
+// Привязываем автоувеличение к событию ввода текста
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.getElementById("input");
+  textarea.addEventListener("input", autoResizeTextarea);
+});
