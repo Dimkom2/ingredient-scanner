@@ -50,8 +50,8 @@ function levenshteinDistance(a, b) {
 }
 
 // Основная функция анализа
-function analyze() {
-  const input = document.getElementById("input").value.toLowerCase().trim();
+function analyze(text) {
+  const input = text.toLowerCase().trim();
   const words = input.split(/[ ,.;:\n]+/);
   const output = document.getElementById("output");
   output.innerHTML = "";
@@ -85,6 +85,27 @@ function analyze() {
   });
 }
 
+// Функция для обработки изображения и извлечения текста
+function processImage() {
+  const imageInput = document.getElementById("imageInput");
+  const file = imageInput.files[0];
+  if (!file) {
+    alert("Пожалуйста, выберите изображение.");
+    return;
+  }
+
+  Tesseract.recognize(
+    file,
+    'rus', // Язык OCR — русский
+    {
+      logger: (m) => console.log(m), // Отображаем процесс OCR в консоли
+    }
+  ).then(({ data: { text } }) => {
+    console.log(text);
+    analyze(text); // передаем извлечённый текст в анализ
+  });
+}
+
 // Функция автоувеличения текстового поля
 function autoResizeTextarea() {
   const textarea = document.getElementById("input");
@@ -105,3 +126,4 @@ document.addEventListener("DOMContentLoaded", function() {
   const textarea = document.getElementById("input");
   textarea.addEventListener("input", autoResizeTextarea);
 });
+p
