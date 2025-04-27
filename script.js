@@ -85,28 +85,29 @@ function analyze() {
   });
 }
 
-// Обработчик загрузки изображения
-document.getElementById("imageInput").addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const image = new Image();
-      image.onload = function() {
-        Tesseract.recognize(
-          image,
-          'rus', 
-          {
-            logger: (m) => console.log(m),
-          }
-        ).then(({ data: { text } }) => {
-          // Заполняем текстовое поле распознанным текстом
-          document.getElementById("input").value = text;
-        });
-      };
-      image.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-});
+// Функция для обработки OCR (распознавание текста с изображения)
+function handleImageUpload(event) {
+  const image = event.target.files[0];
+  if (!image) return;
 
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      Tesseract.recognize(
+        img,
+        'rus', // Язык: русский
+        {
+          logger: (m) => console.log(m), // Логирование прогресса
+        }
+      ).then(({ data: { text } }) => {
+        document.getElementById("input").value = text.trim();
+      });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(image);
+}
+
+// Привязка функции распознавания текста на картинке
+document.getElementById("imageInput").addEventListener("change", handleImageUpload);
