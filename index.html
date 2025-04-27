@@ -9,11 +9,11 @@
 <body>
   <h1>Сканер состава продуктов</h1>
 
-  <textarea id="input" placeholder="Введите состав продукта..."></textarea>
+  <textarea id="input" placeholder="Введите состав продукта..." readonly></textarea>
   <br><br>
 
   <input type="file" id="imageInput" accept="image/*" />
-  <button onclick="processImage()">Проверить состав с изображения</button>
+  <button onclick="analyze()">Проверить состав</button>
 
   <div id="output"></div>
 
