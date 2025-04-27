@@ -50,8 +50,8 @@ function levenshteinDistance(a, b) {
 }
 
 // Основная функция анализа
-function analyze(text) {
-  const input = text.toLowerCase().trim();
+function analyze() {
+  const input = document.getElementById("input").value.toLowerCase().trim();
   const words = input.split(/[ ,.;:\n]+/);
   const output = document.getElementById("output");
   output.innerHTML = "";
@@ -85,45 +85,28 @@ function analyze(text) {
   });
 }
 
-// Функция для обработки изображения и извлечения текста
-function processImage() {
-  const imageInput = document.getElementById("imageInput");
-  const file = imageInput.files[0];
-  if (!file) {
-    alert("Пожалуйста, выберите изображение.");
-    return;
+// Обработчик загрузки изображения
+document.getElementById("imageInput").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const image = new Image();
+      image.onload = function() {
+        Tesseract.recognize(
+          image,
+          'rus', 
+          {
+            logger: (m) => console.log(m),
+          }
+        ).then(({ data: { text } }) => {
+          // Заполняем текстовое поле распознанным текстом
+          document.getElementById("input").value = text;
+        });
+      };
+      image.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   }
-
-  Tesseract.recognize(
-    file,
-    'rus', // Язык OCR — русский
-    {
-      logger: (m) => console.log(m), // Отображаем процесс OCR в консоли
-    }
-  ).then(({ data: { text } }) => {
-    console.log(text);
-    analyze(text); // передаем извлечённый текст в анализ
-  });
-}
-
-// Функция автоувеличения текстового поля
-function autoResizeTextarea() {
-  const textarea = document.getElementById("input");
-  textarea.style.height = "auto";
-  textarea.style.height = textarea.scrollHeight + "px";
-
-  const maxHeight = 200;
-  if (textarea.scrollHeight > maxHeight) {
-    textarea.style.height = maxHeight + "px";
-    textarea.style.overflowY = "auto";
-  } else {
-    textarea.style.overflowY = "hidden";
-  }
-}
-
-// Привязка автоувеличения к полю ввода
-document.addEventListener("DOMContentLoaded", function() {
-  const textarea = document.getElementById("input");
-  textarea.addEventListener("input", autoResizeTextarea);
 });
-p
+
