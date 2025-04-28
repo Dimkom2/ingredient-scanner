@@ -60,22 +60,8 @@ function levenshteinDistance(a, b) {
   return matrix[b.length][a.length];
 }
 
-// Основная функция анализа
-// Функция для поиска похожего слова (автокоррекция)
-function findClosestWord(word) {
-  let minDistance = Infinity;
-  let closestWord = null;
 
-  for (const key in ingredientsDB) {
-    const distance = levenshteinDistance(word, key);
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestWord = key;
-    }
-  }
-
-  return minDistance <= 2 ? closestWord : null; // допускаем до 2 ошибок
-}
+  
 
 // Основная функция анализа
 function analyze() {
@@ -148,33 +134,6 @@ function handleImageUpload(event) {
     alert('Пожалуйста, загрузите изображение.');
     return;
   }
-
-  Tesseract.recognize(
-    image,  // исправил: передавать напрямую файл, не через Image
-    'rus',  // Язык русский
-    {
-      logger: (m) => console.log(m), // Логирование прогресса
-    }
-  ).then(({ data: { text } }) => {
-    document.getElementById("input").value = text.trim();
-    analyze(); // исправил: автоматически запускать анализ после OCR
-  }).catch(err => {
-    console.error('Ошибка OCR:', err);
-    alert('Не удалось распознать текст на изображении.');
-  });
-}
-
-// Привязка функции распознавания текста на картинке
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("imageInput").addEventListener("change", handleImageUpload);
-});
-
-
-
-// Функция для обработки OCR (распознавание текста с изображения)
-function handleImageUpload(event) {
-  const image = event.target.files[0];
-  if (!image) return;
 
   Tesseract.recognize(
     image,  // исправил: передавать напрямую файл, не через Image
