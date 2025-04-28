@@ -36,3 +36,8 @@ button {
 .warning {
   color: orange;
   font-weight: bold;
+
+.good {
+  color: green;           /* Зеленый цвет для хороших ингредиентов */
+  font-weight: bold;
+}
