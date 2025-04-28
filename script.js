@@ -115,6 +115,7 @@ function analyze() {
 }
 
 
+
 // Функция для обработки OCR (распознавание текста с изображения)
 function handleImageUpload(event) {
   const image = event.target.files[0];
