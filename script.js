@@ -76,7 +76,7 @@ function analyze() {
     const phrase = key.toLowerCase(); // Для учета регистра
     const regex = new RegExp(`\\b${phrase}\\b`, 'g'); // Ищем целые фразы
     if (regex.test(input)) {
-      // Если фраза найдена, добавляем её в вывод
+      console.log(`Фраза найдена: ${phrase}`);  // Логируем, если фраза найдена
       const div = document.createElement("div");
       div.className = ingredientsDB[key].level;
       div.innerHTML = `<b>${key}</b>: ${ingredientsDB[key].comment}`;
@@ -85,11 +85,16 @@ function analyze() {
     }
   }
 
+  console.log(`После удаления фраз: ${input}`);  // Логируем оставшуюся строку
+
   // 2. Разделяем оставшуюся строку на отдельные слова
   const words = input.split(/[,.;:\n\s]+/);
+  console.log(`Массив слов: ${words}`);  // Логируем массив слов
 
   words.forEach(word => {
     if (word === "") return; // Пропускаем пустые слова
+
+    console.log(`Обрабатываем слово: ${word}`);  // Логируем текущее слово
 
     let data = ingredientsDB[word];
 
@@ -97,6 +102,7 @@ function analyze() {
     if (!data) {
       const corrected = findClosestWord(word);
       if (corrected) {
+        console.log(`Исправили слово: ${word} на ${corrected}`);  // Логируем исправление слова
         data = ingredientsDB[corrected];
         word = corrected; // Показываем исправленное слово
       }
