@@ -74,57 +74,31 @@ function analyze() {
     return;
   }
 
-  // 1. Проверяем все фразы в базе данных перед разбиением на слова
-  for (const key in ingredientsDB) {
-    const phrase = key.toLowerCase(); // Для учета регистра
-    const escapedPhrase = phrase.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&"); // Экранируем специальные символы
-    const regex = new RegExp(`\\b${escapedPhrase}\\b`, 'g'); // Ищем целые фразы
-    if (regex.test(input)) {
-      console.log(`Фраза найдена: ${phrase}`);  // Логируем, если фраза найдена
+  let foundSomething = false;
+
+  for (const ingredient in ingredientsDB) {
+    const lowerIngredient = ingredient.toLowerCase();
+    if (input.includes(lowerIngredient)) {
       const div = document.createElement("div");
-      div.className = ingredientsDB[key].level;
-      div.innerHTML = `<b>${key}</b>: ${ingredientsDB[key].comment}`;
+      div.className = ingredientsDB[ingredient].level;
+      div.innerHTML = `<b>${ingredient}</b>: ${ingredientsDB[ingredient].comment}`;
       output.appendChild(div);
-      input = input.replace(regex, ''); // Убираем найденную фразу из строки
+
+      foundSomething = true;
+
+      // Убираем найденный ингредиент из текста, чтобы не искать его дважды
+      input = input.replaceAll(lowerIngredient, '');
     }
+    
   }
 
-  console.log(`После удаления фраз: ${input}`);  // Логируем оставшуюся строку
-
-  // 2. Разделяем оставшуюся строку на отдельные слова
-  const words = input.split(/\s+|[,.;:?!\n]+/); // Уточнённое регулярное выражение для разделения
-  console.log(`Массив слов: ${words}`);  // Логируем массив слов
-
-  words.forEach(word => {
-    if (word === "") return; // Пропускаем пустые слова
-
-    console.log(`Обрабатываем слово: ${word}`);  // Логируем текущее слово
-
-    let data = ingredientsDB[word];
-
-    // Если данные для слова не найдены, пробуем найти похожее слово
-    if (!data) {
-      const corrected = findClosestWord(word);
-      if (corrected) {
-        console.log(`Исправили слово: ${word} на ${corrected}`);  // Логируем исправление слова
-        data = ingredientsDB[corrected];
-        word = corrected; // Показываем исправленное слово
-      }
-    }
-
-    // Если данные найдены, выводим информацию о слове
-    if (data) {
-      const div = document.createElement("div");
-      div.className = data.level;
-      div.innerHTML = `<b>${word}</b>: ${data.comment}`;
-      output.appendChild(div);
-    } else {
-      // Если слово не найдено, выводим сообщение
-      const unknown = document.createElement("div");
-      unknown.innerHTML = `<i>${word}</i>: <span style="color: gray">ингредиент не найден / не опознан</span>`;
-      output.appendChild(unknown);
-    }
-  });
+  // Если вообще ничего не найдено
+  if (!foundSomething) {
+    const unknown = document.createElement("div");
+    unknown.innerHTML = `<i>${input}</i>: <span style="color: gray">ингредиенты не распознаны</span>`;
+    output.appendChild(unknown);
+  }
+ });
 }
 
 // Функция для обработки OCR (распознавание текста с изображения)
