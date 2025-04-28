@@ -90,24 +90,22 @@ function handleImageUpload(event) {
   const image = event.target.files[0];
   if (!image) return;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      Tesseract.recognize(
-        img,
-        'rus', // Язык: русский
-        {
-          logger: (m) => console.log(m), // Логирование прогресса
-        }
-      ).then(({ data: { text } }) => {
-        document.getElementById("input").value = text.trim();
-      });
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(image);
+  Tesseract.recognize(
+    image,  // исправил: передавать напрямую файл, не через Image
+    'rus',  // Язык русский
+    {
+      logger: (m) => console.log(m), // Логирование прогресса
+    }
+  ).then(({ data: { text } }) => {
+    document.getElementById("input").value = text.trim();
+    analyze(); // исправил: автоматически запускать анализ после OCR
+  }).catch(err => {
+    console.error('Ошибка OCR:', err);
+    alert('Не удалось распознать текст на изображении.');
+  });
 }
 
 // Привязка функции распознавания текста на картинке
-document.getElementById("imageInput").addEventListener("change", handleImageUpload);
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("imageInput").addEventListener("change", handleImageUpload);
+});
