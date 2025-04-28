@@ -93,20 +93,23 @@ function analyze() {
 
     let data = ingredientsDB[word];
 
+    // Если данные для слова не найдены, пробуем найти похожее слово
     if (!data) {
       const corrected = findClosestWord(word);
       if (corrected) {
         data = ingredientsDB[corrected];
-        word = corrected; // показываем исправленное слово
+        word = corrected; // Показываем исправленное слово
       }
     }
 
+    // Если данные найдены, выводим информацию о слове
     if (data) {
       const div = document.createElement("div");
       div.className = data.level;
       div.innerHTML = `<b>${word}</b>: ${data.comment}`;
       output.appendChild(div);
     } else {
+      // Если слово не найдено, выводим сообщение
       const unknown = document.createElement("div");
       unknown.innerHTML = `<i>${word}</i>: <span style="color: gray">ингредиент не найден / не опознан</span>`;
       output.appendChild(unknown);
