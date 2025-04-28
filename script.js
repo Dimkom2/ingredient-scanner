@@ -63,7 +63,7 @@ function levenshteinDistance(a, b) {
 // Основная функция анализа
 function analyze() {
   const input = document.getElementById("input").value.toLowerCase().trim();
-  const words = input.split(/[ ,.;:\n]+/);
+  const words = input.split(/[,.;:\n]+/);
   const output = document.getElementById("output");
   output.innerHTML = "";
 
