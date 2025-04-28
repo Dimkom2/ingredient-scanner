@@ -63,7 +63,6 @@ function levenshteinDistance(a, b) {
 // Основная функция анализа
 function analyze() {
   const input = document.getElementById("input").value.toLowerCase().trim();
-  const words = input.split(/[,.;:\n]+/);
   const output = document.getElementById("output");
   output.innerHTML = "";
 
@@ -72,7 +71,24 @@ function analyze() {
     return;
   }
 
+  // Проверка всех фраз из базы данных
+  for (const key in ingredientsDB) {
+    if (input.includes(key)) {
+      const div = document.createElement("div");
+      div.className = ingredientsDB[key].level;
+      div.innerHTML = `<b>${key}</b>: ${ingredientsDB[key].comment}`;
+      output.appendChild(div);
+      // Убираем найденные фразы, чтобы не проверять их повторно
+      input = input.replace(key, '');
+    }
+  }
+
+  // Разделяем строку на слова, чтобы обработать их по-отдельности
+  const words = input.split(/[,.;:\n\s]+/);
+
   words.forEach(word => {
+    if (word === "") return; // Пропускаем пустые строки
+
     let data = ingredientsDB[word];
 
     if (!data) {
