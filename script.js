@@ -61,6 +61,23 @@ function levenshteinDistance(a, b) {
 }
 
 // Основная функция анализа
+// Функция для поиска похожего слова (автокоррекция)
+function findClosestWord(word) {
+  let minDistance = Infinity;
+  let closestWord = null;
+
+  for (const key in ingredientsDB) {
+    const distance = levenshteinDistance(word, key);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestWord = key;
+    }
+  }
+
+  return minDistance <= 2 ? closestWord : null; // допускаем до 2 ошибок
+}
+
+// Основная функция анализа
 function analyze() {
   let input = document.getElementById("input").value.toLowerCase().trim();
   const output = document.getElementById("output");
@@ -74,7 +91,8 @@ function analyze() {
   // 1. Проверяем все фразы в базе данных перед разбиением на слова
   for (const key in ingredientsDB) {
     const phrase = key.toLowerCase(); // Для учета регистра
-    const regex = new RegExp(`\\b${phrase}\\b`, 'g'); // Ищем целые фразы
+    const escapedPhrase = phrase.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&"); // Экранируем специальные символы
+    const regex = new RegExp(`\\b${escapedPhrase}\\b`, 'g'); // Ищем целые фразы
     if (regex.test(input)) {
       console.log(`Фраза найдена: ${phrase}`);  // Логируем, если фраза найдена
       const div = document.createElement("div");
@@ -88,7 +106,7 @@ function analyze() {
   console.log(`После удаления фраз: ${input}`);  // Логируем оставшуюся строку
 
   // 2. Разделяем оставшуюся строку на отдельные слова
-  const words = input.split(/[,.;:\n\s]+/);
+  const words = input.split(/\s+|[,.;:?!\n]+/); // Уточнённое регулярное выражение для разделения
   console.log(`Массив слов: ${words}`);  // Логируем массив слов
 
   words.forEach(word => {
@@ -122,6 +140,34 @@ function analyze() {
     }
   });
 }
+
+// Функция для обработки OCR (распознавание текста с изображения)
+function handleImageUpload(event) {
+  const image = event.target.files[0];
+  if (!image || !image.type.startsWith('image/')) {
+    alert('Пожалуйста, загрузите изображение.');
+    return;
+  }
+
+  Tesseract.recognize(
+    image,  // исправил: передавать напрямую файл, не через Image
+    'rus',  // Язык русский
+    {
+      logger: (m) => console.log(m), // Логирование прогресса
+    }
+  ).then(({ data: { text } }) => {
+    document.getElementById("input").value = text.trim();
+    analyze(); // исправил: автоматически запускать анализ после OCR
+  }).catch(err => {
+    console.error('Ошибка OCR:', err);
+    alert('Не удалось распознать текст на изображении.');
+  });
+}
+
+// Привязка функции распознавания текста на картинке
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("imageInput").addEventListener("change", handleImageUpload);
+});
 
 
 
