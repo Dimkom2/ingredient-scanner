@@ -6,13 +6,14 @@ body {
 
 textarea {
   width: 100%;
-  min-height: 50px;        /* минимальная высота */
-  max-height: 200px;       /* высота-ограничитель */
+  min-height: 50px;
+  max-height: 350px;       /* Увеличили максимум до 350px */
   font-size: 16px;
   padding: 10px;
   margin-bottom: 10px;
-  overflow-y: hidden;      /* скрыть скролл пока текст помещается */
-  resize: none;            /* запретить ручное изменение размера */
+  overflow-y: auto;        /* Изменили на auto для скролла при переполнении */
+  resize: none;
+  transition: height 0.2s ease; /* Добавили плавность */
 }
 
 button {
