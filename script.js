@@ -23,15 +23,20 @@ function findClosestWord(word) {
 
   for (const key in ingredientsDB) {
     const distance = levenshteinDistance(word, key);
-    if (distance < minDistance) {
+    // Динамический порог ошибок: 
+    // - до 5 букв: макс 1 ошибка
+    // - 5-9 букв: макс 2 ошибки
+    // - 10+ букв: макс 3 ошибки
+    const maxAllowedErrors = key.length <= 5 ? 1 : key.length <= 9 ? 2 : 3;
+    
+    if (distance < minDistance && distance <= maxAllowedErrors) {
       minDistance = distance;
       closestWord = key;
     }
   }
 
-  return minDistance <= 1 ? closestWord : null; // допускаем только 1 ошибку
+  return closestWord; // Возвращаем ближайшее слово, если уложились в ошибки
 }
-
 // Функция расчёта расстояния Левенштейна
 function levenshteinDistance(a, b) {
   const matrix = [];
