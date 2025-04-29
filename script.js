@@ -83,38 +83,25 @@ function analyze() {
     .toLowerCase()
     .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
-  let found = false;
-
-  // 1. Сначала ищем ТОЧНЫЕ совпадения (ваш исходный код)
-  for (const [ingredient, data] of Object.entries(ingredientsDB)) {
-    const lowerIngredient = ingredient.toLowerCase();
-    if (cleanedInput.includes(lowerIngredient) || lowerIngredient.includes(cleanedInput)) {
-      addIngredientToOutput(ingredient, data);
-      found = true;
-    }
-  }
-
-  // 2. Если точных совпадений нет — применяем автокоррекцию ко ВСЕМУ вводу
-  if (!found) {
-    const closestIngredient = findClosestWord(cleanedInput);
-    if (closestIngredient) {
-      addIngredientToOutput(closestIngredient, ingredientsDB[closestIngredient]);
-      found = true;
-    }
-  }
-
-  if (!found) {
+  // ТОЛЬКО автокоррекция (без includes)
+  const closestIngredient = findClosestWord(cleanedInput);
+  
+  if (closestIngredient) {
+    addIngredientToOutput(closestIngredient, ingredientsDB[closestIngredient]);
+  } else {
     output.innerHTML = "<i>Не найдено опасных ингредиентов. Проверьте написание.</i>";
   }
 }
 
-// Вспомогательная функция для вывода (без изменений)
+// Вспомогательная функция без изменений
 function addIngredientToOutput(ingredient, data) {
   const div = document.createElement("div");
   div.className = data.level;
   div.innerHTML = `<b>${ingredient}</b>: ${data.comment}`;
   output.appendChild(div);
 }
+
+
 // Функция для обработки OCR (распознавание текста с изображения)
 function handleImageUpload(event) {
   const image = event.target.files[0];
