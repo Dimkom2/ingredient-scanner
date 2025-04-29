@@ -23,20 +23,15 @@ function findClosestWord(word) {
 
   for (const key in ingredientsDB) {
     const distance = levenshteinDistance(word, key);
-    // Динамический порог ошибок: 
-    // - до 5 букв: макс 1 ошибка
-    // - 5-9 букв: макс 2 ошибки
-    // - 10+ букв: макс 3 ошибки
-    const maxAllowedErrors = key.length <= 5 ? 1 : key.length <= 9 ? 2 : 3;
-    
-    if (distance < minDistance && distance <= maxAllowedErrors) {
+    if (distance < minDistance && distance <= 2) { // Жёстко фиксируем 2 ошибки
       minDistance = distance;
       closestWord = key;
     }
   }
 
-  return closestWord; // Возвращаем ближайшее слово, если уложились в ошибки
+  return closestWord; // Вернёт null, если нет совпадений с ≤2 ошибками
 }
+
 // Функция расчёта расстояния Левенштейна
 function levenshteinDistance(a, b) {
   const matrix = [];
@@ -83,22 +78,17 @@ function analyze() {
     .toLowerCase()
     .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
-  // ТОЛЬКО автокоррекция (без includes)
+  // Ищем ближайший ингредиент (макс 2 ошибки)
   const closestIngredient = findClosestWord(cleanedInput);
   
   if (closestIngredient) {
-    addIngredientToOutput(closestIngredient, ingredientsDB[closestIngredient]);
+    const div = document.createElement("div");
+    div.className = ingredientsDB[closestIngredient].level;
+    div.innerHTML = `<b>${closestIngredient}</b>: ${ingredientsDB[closestIngredient].comment}`;
+    output.appendChild(div);
   } else {
     output.innerHTML = "<i>Не найдено опасных ингредиентов. Проверьте написание.</i>";
   }
-}
-
-// Вспомогательная функция без изменений
-function addIngredientToOutput(ingredient, data) {
-  const div = document.createElement("div");
-  div.className = data.level;
-  div.innerHTML = `<b>${ingredient}</b>: ${data.comment}`;
-  output.appendChild(div);
 }
 
 
