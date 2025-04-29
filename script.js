@@ -65,41 +65,41 @@ function levenshteinDistance(a, b) {
 
 // Основная функция анализа
 function analyze() {
-  let input = document.getElementById("input").value.toLowerCase().trim();
+  const inputText = document.getElementById("input").value.trim();
   const output = document.getElementById("output");
+  
+  // Очищаем предыдущие результаты
   output.innerHTML = "";
 
-  if (input === "") {
-    output.innerHTML = "<i>Пожалуйста, введите состав продукта.</i>";
+  if (!inputText) {
+    output.innerHTML = "<i>Введите состав или загрузите фото.</i>";
     return;
   }
 
-  let foundSomething = false;
+  // Чистим ввод от лишних символов и приводим к нижнему регистру
+  const cleanedInput = inputText
+    .toLowerCase()
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
-  for (const ingredient in ingredientsDB) {
+  let found = false;
+
+  // Ищем каждый ингредиент из базы в тексте
+  for (const [ingredient, data] of Object.entries(ingredientsDB)) {
     const lowerIngredient = ingredient.toLowerCase();
-    if (input.includes(lowerIngredient)) {
+    if (cleanedInput.includes(lowerIngredient) || lowerIngredient.includes(cleanedInput)) {
       const div = document.createElement("div");
-      div.className = ingredientsDB[ingredient].level;
-      div.innerHTML = `<b>${ingredient}</b>: ${ingredientsDB[ingredient].comment}`;
+      div.className = data.level;
+      div.innerHTML = `<b>${ingredient}</b>: ${data.comment}`;  // или textContent для безопасности
       output.appendChild(div);
-
-      foundSomething = true;
-
-      // Убираем найденный ингредиент из текста, чтобы не искать его дважды
-      input = input.replaceAll(lowerIngredient, '');
+      found = true;
     }
-    
   }
 
-  // Если вообще ничего не найдено
-  if (!foundSomething) {
-    const unknown = document.createElement("div");
-    unknown.innerHTML = `<i>${input}</i>: <span style="color: gray">ингредиенты не распознаны</span>`;
-    output.appendChild(unknown);
+  // Если ничего не нашли
+  if (!found) {
+    output.innerHTML = "<i>Не найдено опасных ингредиентов. Проверьте написание.</i>";
   }
 }
-
 // Функция для обработки OCR (распознавание текста с изображения)
 function handleImageUpload(event) {
   const image = event.target.files[0];
