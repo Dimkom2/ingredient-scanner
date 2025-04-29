@@ -16,6 +16,14 @@ const ingredientsDB = {
 };
 
 
+
+// Авторесайз textarea
+document.getElementById("input").addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 350) + 'px';
+});
+
+
 // Функция для поиска похожего слова (автокоррекция)
 function findClosestWord(word) {
   let minDistance = Infinity;
