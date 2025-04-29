@@ -98,7 +98,6 @@ function analyze() {
     unknown.innerHTML = `<i>${input}</i>: <span style="color: gray">ингредиенты не распознаны</span>`;
     output.appendChild(unknown);
   }
- });
 }
 
 // Функция для обработки OCR (распознавание текста с изображения)
