@@ -15,63 +15,51 @@ const ingredientsDB = {
   "нитрит натрия (E250)": { level: "bad", comment: "Нитрит натрия используется для консервирования, но в избытке токсичен." }
 };
 
+// ▼▼▼ НОВЫЙ КОД ▼▼▼
+function resizeTextarea() {
+  const textarea = document.getElementById("input");
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 350) + 'px';
+}
 
+document.getElementById("input").addEventListener('input', resizeTextarea);
+// ▲▲▲ КОНЕЦ НОВОГО КОДА ▲▲▲
 
-// Авторесайз textarea
-document.getElementById("input").addEventListener('input', function() {
-  this.style.height = 'auto';
-  this.style.height = Math.min(this.scrollHeight, 350) + 'px';
-});
-
-
-// Функция для поиска похожего слова (автокоррекция)
 function findClosestWord(word) {
   let minDistance = Infinity;
   let closestWord = null;
 
   for (const key in ingredientsDB) {
     const distance = levenshteinDistance(word, key);
-    if (distance < minDistance && distance <= 2) { // Жёстко фиксируем 2 ошибки
+    if (distance < minDistance && distance <= 2) {
       minDistance = distance;
       closestWord = key;
     }
   }
-
-  return closestWord; // Вернёт null, если нет совпадений с ≤2 ошибками
+  return closestWord;
 }
 
-// Функция расчёта расстояния Левенштейна
 function levenshteinDistance(a, b) {
   const matrix = [];
-
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
+      if (b.charAt(i-1) === a.charAt(j-1)) {
+        matrix[i][j] = matrix[i-1][j-1];
       } else {
         matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // замена
-          matrix[i][j - 1] + 1,     // вставка
-          matrix[i - 1][j] + 1      // удаление
+          matrix[i-1][j-1] + 1,
+          matrix[i][j-1] + 1,
+          matrix[i-1][j] + 1
         );
       }
     }
   }
-
   return matrix[b.length][a.length];
 }
 
-
-  
-
-// Основная функция анализа
 function analyze() {
   const inputText = document.getElementById("input").value.trim();
   const output = document.getElementById("output");
@@ -86,9 +74,7 @@ function analyze() {
     .toLowerCase()
     .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
-  // Ищем ближайший ингредиент (макс 2 ошибки)
   const closestIngredient = findClosestWord(cleanedInput);
-  
   if (closestIngredient) {
     const div = document.createElement("div");
     div.className = ingredientsDB[closestIngredient].level;
@@ -99,8 +85,6 @@ function analyze() {
   }
 }
 
-
-// Функция для обработки OCR (распознавание текста с изображения)
 function handleImageUpload(event) {
   const image = event.target.files[0];
   if (!image || !image.type.startsWith('image/')) {
@@ -109,21 +93,20 @@ function handleImageUpload(event) {
   }
 
   Tesseract.recognize(
-    image,  // исправил: передавать напрямую файл, не через Image
-    'rus',  // Язык русский
-    {
-      logger: (m) => console.log(m), // Логирование прогресса
-    }
+    image,
+    'rus',
+    { logger: m => console.log(m) }
   ).then(({ data: { text } }) => {
-    document.getElementById("input").value = text.trim();
-    analyze(); // исправил: автоматически запускать анализ после OCR
+    const input = document.getElementById("input");
+    input.value = text.trim();
+    resizeTextarea(); // ▲▲▲ ВЫЗОВ ФУНКЦИИ АВТОРЕСАЙЗА ▲▲▲
+    analyze();
   }).catch(err => {
     console.error('Ошибка OCR:', err);
     alert('Не удалось распознать текст на изображении.');
   });
 }
 
-// Привязка функции распознавания текста на картинке
 document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("imageInput").addEventListener("change", handleImageUpload);
 });
